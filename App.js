@@ -3,21 +3,43 @@ import {View, Text} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import OnBoardScreen from './src/screens/OnBoardScreen';
+import OnBoardingScreen from './src/screens/OnBoarding';
 import HomeScreen from './src/screens/HomeScreen';
-import DetailsScreen from './src/screens/DetailsScreen';
 
 const Stack = createStackNavigator();
 
 function App() {
+  const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      const appData = await AsyncStorage.getItem('isAppFirstLaunched');
+      if (appData === null) {
+        setIsAppFirstLaunched(true);
+        await AsyncStorage.setItem('isAppFirstLaunched', 'false');
+      } else {
+        setIsAppFirstLaunched(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
   return (
+    isAppFirstLaunched != null && (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="OnboardingScreen" component={OnBoardScreen} />
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
+        {isAppFirstLaunched && (
+          <Stack.Screen 
+          name="OnboardingScreen" 
+          component={OnBoardingScreen}
+           />
+        )}
+        <Stack.Screen 
+        name="HomeScreen" 
+        component={HomeScreen} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
+  )
   );
 }
 
